@@ -76,6 +76,21 @@
       :show-field="!!drawingList.length"
       @tagChange="tagChange"
     ></RightPanel>
+
+    <JsonDrawer
+      size="60%"
+      :visible.sync="jsonDrawerVisible"
+      :json-str="JSON.stringify(formData)"
+      @refresh="refreshJson"
+    ></JsonDrawer>
+
+    <CodeTypeDialog
+      :showFileName="showFileName"
+      title="选择生成类型"
+      :visible.sync="dialogVisible"
+      @confirm="generate"
+    ></CodeTypeDialog>
+    <input id="copyNode" type="hidden">
   </div>
 </template>
 
@@ -87,9 +102,18 @@ import drawingDefalut from "@/components/generator/drawingDefalut";
 import DraggableItem from "@/views/index/DraggableItem.vue";
 import {getIdGlobal} from "@/utils/db";
 import {cloneDeep} from "lodash";
+import JsonDrawer from "@/views/index/JsonDrawer.vue";
+import CodeTypeDialog from "@/views/index/CodeTypeDialog.vue";
+import {beautifierConf, titleCase} from "@/utils";
+import loadBeautifier from "@/utils/loadBeautifer";
+import ClipboardJS from "clipboard";
+import {cookHtml, vueScript, vueTemplate, cssStyle} from "@/components/generator/html";
+import {cookJs} from "@/components/generator/js";
+import {cookCss} from "@/components/generator/css";
 
 const idGlobal = getIdGlobal()
 let tempActiveData
+let beautifier;
 export default {
   name: 'Home',
   computed: {
@@ -97,7 +121,9 @@ export default {
   components: {
     RightPanel,
     draggable,
-    DraggableItem
+    DraggableItem,
+    JsonDrawer,
+    CodeTypeDialog
   },
   data() {
     return {
@@ -108,6 +134,10 @@ export default {
       activeId: drawingDefalut[0].formId,
       drawingList: drawingDefalut,
       jsonDrawerVisible: false,
+      dialogVisible: false,
+      showFileName: false,
+      drawerVisible: false,
+      operationType: '',
       leftComponents: [
         {
           title: '输入型组件',
@@ -123,6 +153,24 @@ export default {
   mounted() {
     this.drawingList = drawingDefalut
     this.setActiveFormItem(this.drawingList[0])
+
+    loadBeautifier(btf => {
+      beautifier = btf
+    })
+    const clipboard = new ClipboardJS('#copyNode', {
+      text: () => {
+        const codeStr = this.generateCode()
+        this.$notify({
+          title: '成功',
+          message: '代码已复制到剪切板，可粘贴。',
+          type: 'success'
+        })
+        return codeStr
+      }
+    })
+    clipboard.on('error', () => {
+      this.$message.error('代码复制失败')
+    })
   },
   methods: {
     tagChange() {
@@ -190,14 +238,51 @@ export default {
         ...this.formConf
       }
     },
-    run () {},
+    refreshJson (data) {
+      this.drawingList = cloneDeep(data.fields)
+      delete data.fields
+      this.formConf = data
+    },
+    run () {
+      this.dialogVisible = true
+      this.showFileName = false
+      this.operationType = 'run'
+    },
     showJson () {
       this.mergeJson()
       this.jsonDrawerVisible = true
     },
+    generate(data) {
+      const func = this[`exec${titleCase(this.operationType)}`]
+      this.generateConf = data
+      func && func(data)
+    },
+    execRun() {
+      this.mergeJson()
+      this.drawerVisible = true
+    },
+    execCopy() {
+      document.getElementById('copyNode').click()
+    },
+    generateCode() {
+      const { type } = this.generateConf
+      this.mergeJson()
+      const script = vueScript(cookJs(this.formData, type))
+      const html = vueTemplate(cookHtml(this.formData, type))
+      const css = cssStyle(cookCss(this.formData))
+      let res = beautifier.html(html + script + css, beautifierConf.html)
+      console.log(res)
+      return res
+    },
     download () {},
-    copy () {},
-    empty () {},
+    copy () {
+      this.dialogVisible = true
+      this.showFileName = false
+      this.operationType = 'copy'
+    },
+    empty () {
+
+    },
   }
 }
 </script>
