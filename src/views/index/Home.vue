@@ -118,6 +118,7 @@ import {cookHtml, vueScript, vueTemplate, cssStyle} from "@/components/generator
 import {cookJs} from "@/components/generator/js";
 import {cookCss} from "@/components/generator/css";
 import FormDrawer from "@/views/index/FormDrawer.vue";
+import {saveAs} from 'file-saver'
 
 const idGlobal = getIdGlobal()
 let tempActiveData
@@ -274,6 +275,11 @@ export default {
     execCopy() {
       document.getElementById('copyNode').click()
     },
+    execDownload(data) {
+      const codeStr = this.generateCode()
+      const blob = new Blob([codeStr], { type: 'text/plain;charset=utf-8' })
+      saveAs(blob, data.fileName)
+    },
     generateCode() {
       const { type } = this.generateConf
       this.mergeJson()
@@ -283,7 +289,11 @@ export default {
       let res = beautifier.html(html + script + css, beautifierConf.html)
       return res
     },
-    download () {},
+    download () {
+      this.dialogVisible = true
+      this.showFileName = true
+      this.operationType = 'download'
+    },
     copy () {
       this.dialogVisible = true
       this.showFileName = false
