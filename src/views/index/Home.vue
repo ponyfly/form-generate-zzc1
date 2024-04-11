@@ -107,7 +107,7 @@ import RightPanel from "@/views/index/RightPanel.vue";
 import {formConf, inputComponents, selectComponents} from "@/components/generator/config";
 import drawingDefalut from "@/components/generator/drawingDefalut";
 import DraggableItem from "@/views/index/DraggableItem.vue";
-import {getIdGlobal} from "@/utils/db";
+import {getDrawingList, getIdGlobal, saveDrawingList, saveIdGlobal} from "@/utils/db";
 import {cloneDeep} from "lodash";
 import JsonDrawer from "@/views/index/JsonDrawer.vue";
 import CodeTypeDialog from "@/views/index/CodeTypeDialog.vue";
@@ -119,11 +119,13 @@ import {cookJs} from "@/components/generator/js";
 import {cookCss} from "@/components/generator/css";
 import FormDrawer from "@/views/index/FormDrawer.vue";
 import {saveAs} from 'file-saver'
+import {debounce} from "lodash-es";
 
 const idGlobal = getIdGlobal()
 let tempActiveData
 let beautifier;
 let oldActiveId;
+const drawingListInDb = getDrawingList()
 export default {
   name: 'Home',
   computed: {
@@ -144,6 +146,8 @@ export default {
       activeData: drawingDefalut[0],
       activeId: drawingDefalut[0].formId,
       drawingList: drawingDefalut,
+      saveDrawingListDebounce: debounce(saveDrawingList, 500),
+      saveIdGlobalDebounce: debounce(saveIdGlobal, 500),
       jsonDrawerVisible: false,
       dialogVisible: false,
       showFileName: false,
@@ -178,10 +182,27 @@ export default {
         oldActiveId = val
       },
       immediate: true
+    },
+    drawingList: {
+      handler(val) {
+        this.saveDrawingListDebounce(val)
+        if (val.length === 0) this.idGlobal = 100
+      },
+      deep: true
+    },
+    idGlobal: {
+      handler(val) {
+        this.saveIdGlobalDebounce(val)
+      },
+      immediate: true
     }
   },
   mounted() {
-    this.drawingList = drawingDefalut
+    if (Array.isArray(drawingListInDb) && drawingListInDb.length > 0) {
+      this.drawingList = drawingListInDb
+    } else {
+      this.drawingList = drawingDefalut
+    }
     this.setActiveFormItem(this.drawingList[0])
 
     loadBeautifier(btf => {
