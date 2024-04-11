@@ -123,6 +123,7 @@ import {saveAs} from 'file-saver'
 const idGlobal = getIdGlobal()
 let tempActiveData
 let beautifier;
+let oldActiveId;
 export default {
   name: 'Home',
   computed: {
@@ -159,6 +160,24 @@ export default {
           list: selectComponents
         }
       ],
+    }
+  },
+  watch: {
+    'activeData.__config__.label': function (val, oldVal) {
+      if (
+          this.activeData.placeholder === undefined
+          || !this.activeData.__config__.tag
+          || oldActiveId !== this.activeId
+      ) {
+        return
+      }
+      this.activeData.placeholder = this.activeData.placeholder.replace(oldVal, '') + val
+    },
+    activeId: {
+      handler(val) {
+        oldActiveId = val
+      },
+      immediate: true
     }
   },
   mounted() {
