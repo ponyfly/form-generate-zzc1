@@ -300,7 +300,17 @@ export default {
       this.operationType = 'copy'
     },
     empty () {
-
+      this.$confirm('确认清空表单吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.drawingList = []
+        this.activeData = {}
+        this.activeId = ''
+        this.idGlobal = 100
+      }).catch(() => {
+      })
     },
   }
 }
