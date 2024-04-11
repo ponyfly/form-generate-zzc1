@@ -40,7 +40,15 @@ const tags = {
 		let child = buildElInputChild(el)
 
 		if (child) child = `\n${child}\n`
-		return `<${tag} ${vModel} ${clearable} ${placeholder} ${width} ${disabled} ${maxLength} ${showWordLimit} ${readonly} ${prefixIcon} ${suffixIcon} ${showPassword} ${type} ${autosize}>`
+		return `<${tag} ${vModel} ${clearable} ${placeholder} ${width} ${disabled} ${maxLength} ${showWordLimit} ${readonly} ${prefixIcon} ${suffixIcon} ${showPassword} ${type} ${autosize}>${child}</${tag}>`
+	},
+	'el-select': el => {
+		const {tag, disabled, vModel, clearable, placeholder, width} = attrBuilder(el)
+
+		let child = buildElSelectChild(el)
+
+		if (child) child = `\n${child}\n`
+		return `<${tag} ${vModel} ${clearable} ${placeholder} ${width} ${disabled}>${child}</${tag}>`
 	}
 }
 
@@ -52,6 +60,14 @@ function buildElInputChild(scheme) {
 	}
 	if (slot && slot.append) {
 		children.push(`<template slot="append">${slot.append}</template>`)
+	}
+	return children.join('\n')
+}
+function buildElSelectChild(scheme) {
+	const children = []
+	const slot = scheme.__slot__
+	if (slot && slot.options && slot.options.length) {
+		children.push(`<el-option v-for="(item, index) in ${scheme.__vModel__}Options" :key="index" :label="item.label" :value="item.value" :disabled="item.disabled"></el-option>`)
 	}
 	return children.join('\n')
 }

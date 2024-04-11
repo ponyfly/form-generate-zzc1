@@ -71,7 +71,7 @@ export default {
     },
     onOpen() {
       loadBeautifier(btf => {
-        let beautifier = btf;
+        beautifier = btf;
         this.beautifierJson = beautifier.js(this.jsonStr, beautifierConf.js)
 
         loadMonaco(mco => {
