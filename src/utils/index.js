@@ -6,6 +6,8 @@ export function titleCase(str) {
 	return str.replace(/( |^)[a-z]/g, L => L.toUpperCase())
 }
 
+export const exportDefault = 'export default '
+
 export const beautifierConf = {
 	html: {
 		indent_size: '2',

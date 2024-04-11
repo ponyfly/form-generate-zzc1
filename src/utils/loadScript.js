@@ -31,3 +31,13 @@ export default function loadScript(src, callback) {
 		}
 	}
 }
+
+/**
+ * 顺序加载一组远程脚本
+ * @param list
+ * @param cb
+ */
+export function loadScriptQueue(list, cb) {
+	const first = list.shift()
+	list.length ? loadScript(first, () => loadScriptQueue(list, cb)) : loadScript(first, cb)
+}

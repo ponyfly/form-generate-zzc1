@@ -111,9 +111,9 @@ function buildRules(schema, ruleList) {
 	const rules = []
 	if (ruleTrigger[config.tag]) {
 		if(config.required) {
-			const type = Array.isArray(config.defaultValue) ? 'type: \'array\'' : ''
+			const type = Array.isArray(config.defaultValue) ? 'type: \'array\',' : ''
 			const message = Array.isArray(config.defaultValue) ? `请至少选择一个${config.label}` : (schema.placeholder || `${config.label}不能为空`)
-			rules.push(`{ required: true, ${type}, message: '${message}', trigger: '${ruleTrigger[config.tag]}' }`)
+			rules.push(`{ required: true, ${type} message: '${message}', trigger: '${ruleTrigger[config.tag]}' }`)
 		}
 		if (config.regList && config.regList.length) {
 			config.regList.forEach(item => {

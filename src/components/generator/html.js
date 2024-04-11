@@ -27,7 +27,7 @@ const layouts = {
 const tags = {
 	'el-input': el => {
 		const {tag, disabled, vModel, clearable, placeholder, width} = attrBuilder(el)
-		const maxLength = el.maxlength ? `maxlength=="${el.maxlength}"` : ''
+		const maxLength = el.maxlength ? `maxlength="${el.maxlength}"` : ''
 		const showWordLimit = el['show-word-limit'] ? 'show-word-limit' : ''
 		const readonly = el.readonly ? 'readonly' : ''
 		const prefixIcon = el['prefix-icon'] ? `prefix-icon='${el['prefix-icon']}'` : ''

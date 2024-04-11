@@ -101,7 +101,7 @@ export default {
     onClose() {},
     refresh() {
       try {
-        this.$emit('refresh', JSON.parse(this.jsonEditor.getValue()))
+        this.$emit('refresh', JSON.parse(this.editor.getValue()))
       } catch (error) {
         this.$notify({
           title: '错误',

@@ -77,6 +77,13 @@
       @tagChange="tagChange"
     ></RightPanel>
 
+    <FormDrawer
+        :visible.sync="drawerVisible"
+        :form-data="formData"
+        size="100%"
+        :generate-conf="generateConf"
+    />
+
     <JsonDrawer
       size="60%"
       :visible.sync="jsonDrawerVisible"
@@ -110,6 +117,7 @@ import ClipboardJS from "clipboard";
 import {cookHtml, vueScript, vueTemplate, cssStyle} from "@/components/generator/html";
 import {cookJs} from "@/components/generator/js";
 import {cookCss} from "@/components/generator/css";
+import FormDrawer from "@/views/index/FormDrawer.vue";
 
 const idGlobal = getIdGlobal()
 let tempActiveData
@@ -119,6 +127,7 @@ export default {
   computed: {
   },
   components: {
+    FormDrawer,
     RightPanel,
     draggable,
     DraggableItem,
@@ -138,6 +147,7 @@ export default {
       showFileName: false,
       drawerVisible: false,
       operationType: '',
+      generateConf: null,
       leftComponents: [
         {
           title: '输入型组件',
@@ -271,7 +281,6 @@ export default {
       const html = vueTemplate(cookHtml(this.formData, type))
       const css = cssStyle(cookCss(this.formData))
       let res = beautifier.html(html + script + css, beautifierConf.html)
-      console.log(res)
       return res
     },
     download () {},
